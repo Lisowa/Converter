@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using UnitConverter.Logic;
 
@@ -15,7 +10,6 @@ namespace UnitConverter
     public partial class FormMain : System.Windows.Forms.Form
     {
         private List<Category> categories;
-       // private List<string> categories;
         private Category selectedCategory;
         private string selectedUnitFrom;
         private string selectedUnitTo;
@@ -25,7 +19,6 @@ namespace UnitConverter
   
         public FormMain()
         {
-          
             InitializeComponent();
             CreateCategories();
 
@@ -33,7 +26,6 @@ namespace UnitConverter
             comboBoxСategory.ValueMember = "Name";
             comboBoxСategory.DisplayMember = "TranslateName";
             comboBoxСategory.DataSource = displayCategories;
-
         }
 
         private void buttonCalculate_Click(object sender, EventArgs e)
@@ -66,7 +58,6 @@ namespace UnitConverter
             {
                 MessageBox.Show("Допускается ввод только чисел.\nВ качестве разделителя используйте \".\".", "Неверный формат!");
             }
-
         }
 
         private void comboBoxСategory_SelectedValueChanged(object sender, EventArgs e)
@@ -89,7 +80,6 @@ namespace UnitConverter
 
         private void checkBoxToAllUnits_CheckedChanged(object sender, EventArgs e)
         {
-
             if (checkBoxToAllUnits.Checked)
             {
                 comboBoxUnitTo.Enabled = false;
