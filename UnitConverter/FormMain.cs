@@ -44,12 +44,12 @@ namespace UnitConverter
 
                 if (checkBoxToAllUnits.Checked)
                 {
-                    string valueWithUnitFrom = enteredValue.ToString() + " " + selectedUnitFrom;
+                    string valueWithUnitFrom = enteredValue.ToString() + " " + translateUnitsEnToRu[selectedUnitFrom];
                     string valueWithUnitTo = null;
 
                     foreach (var unitto in selectedCategory.UnitList)
                     {
-                        valueWithUnitTo += selectedCategory.Convert(enteredValue, selectedUnitFrom, unitto).ToString() + " " + unitto + "\r\n\r\n";
+                        valueWithUnitTo += selectedCategory.Convert(enteredValue, selectedUnitFrom, unitto).ToString() + " " + translateUnitsEnToRu[unitto] + "\r\n\r\n";
                     }
 
                     var formToAllUnints = new FormToAllUnints(valueWithUnitFrom, valueWithUnitTo);
