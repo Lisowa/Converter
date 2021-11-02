@@ -14,81 +14,33 @@ namespace UnitConverter
 {
     public partial class FormMain : System.Windows.Forms.Form
     {
-
-        /* Dictionary<string, string> _mapUnit = new Dictionary<string, string>()
-         {
-             { "meter", "метр" },
-             { "yard", "ярд" },
-         };
-
-         List<string> _units = new List<string>() { "meter", "yard" };*/
-
         private List<Category> categories;
+       // private List<string> categories;
         private Category selectedCategory;
         private string selectedUnitFrom;
         private string selectedUnitTo;
         private double enteredValue;
-        private Dictionary<string,string> translateCategoriesEnToRu;
+        private Dictionary<string, string> translateCategoriesEnToRu;
         private Dictionary<string, string> translateUnitsEnToRu;
-        private List<string> categoriesNameRu;
-
+  
         public FormMain()
         {
             InitializeComponent();
-            
-         
-            
             CreateCategories();
 
+            var displayCategories = CreateTranslationsCategory(categories, translateCategoriesEnToRu);
+            comboBoxСategory.ValueMember = "Name";
+            comboBoxСategory.DisplayMember = "TranslateName";
+            comboBoxСategory.DataSource = displayCategories;
 
-
-
-            comboBoxСategory.DataSource =  categories;//categoriesNameRu;
-           
-
-            comboBoxСategory.DisplayMember = "Name";
-
-            /* selectedCategory = categories[0];
-
-             comboBoxUnitTo.DataSource = selectedCategory.UnitList;
-             //comboBoxUnitTo.DisplayMember = "Name";
-             comboBoxUnitFrom.DataSource  = selectedCategory.UnitList.ToList();
-             // comboBoxUnitFrom.DisplayMember = "Name";
-
-
-             enteredValue = double.Parse(textBoxFrom.Text);
-             selectedUnitFrom = comboBoxUnitFrom.Text;
-             selectedUnitTo = comboBoxUnitTo.Text;
-
-             */
-
-
-
-
-
-            /*   var source  = new list<string>();
-                 foreach (var unit in _units)
-                 {
-                     source.add(unit, _mapunit[unit]);
-                 }
-
-                 foreach (var item in _mapUnit)
-                 {
-                     if (item.Value == "метр")
-                         item.Key;
-                 }
-
-                 comboBoxUnitFrom.DataSource = source;
-                 comboBoxUnitFrom.DisplayMember = "Value";
-               */
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             if (double.TryParse(textBoxFrom.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out enteredValue))
             {
-                selectedUnitFrom = comboBoxUnitFrom.Text;
-                //string selectedUnitToDisplay= (string)comboBoxUnitFrom.SelectedItem;
+                //selectedUnitFrom = comboBoxUnitFrom.Text;
+                selectedUnitFrom = (string)comboBoxUnitFrom.SelectedValue;
 
                 if (checkBoxToAllUnits.Checked)
                 {
@@ -97,8 +49,8 @@ namespace UnitConverter
 
                     foreach (var unitto in selectedCategory.UnitList)
                     {
-                        valueWithUnitTo += selectedCategory.Convert(enteredValue, selectedUnitFrom, unitto).ToString() + " " + unitto + "\r\n\r\n";  
-                    }                    
+                        valueWithUnitTo += selectedCategory.Convert(enteredValue, selectedUnitFrom, unitto).ToString() + " " + unitto + "\r\n\r\n";
+                    }
 
                     var formToAllUnints = new FormToAllUnints(valueWithUnitFrom, valueWithUnitTo);
                     formToAllUnints.ShowDialog();
@@ -114,6 +66,38 @@ namespace UnitConverter
                 MessageBox.Show("Допускается ввод только чисел.\nВ качестве разделителя используйте \".\".", "Неверный формат!");
             }
 
+        }
+
+        private void comboBoxСategory_SelectedValueChanged(object sender, EventArgs e)
+        {
+            selectedCategory = (Category)comboBoxСategory.SelectedValue;
+            if (selectedCategory == null) return;
+            var displayUnitsFrom = CreateTranslations(selectedCategory.UnitList, translateUnitsEnToRu);
+            var displayUnitsTo = CreateTranslations(selectedCategory.UnitList, translateUnitsEnToRu);
+
+            comboBoxUnitTo.DataSource = displayUnitsTo;
+            comboBoxUnitTo.ValueMember = "Name";
+            comboBoxUnitTo.DisplayMember = "TranslateName";
+
+            comboBoxUnitFrom.DataSource = displayUnitsFrom;
+            comboBoxUnitFrom.ValueMember = "Name";
+            comboBoxUnitFrom.DisplayMember = "TranslateName";
+
+            textBoxTo.Text = " ";
+        }
+
+        private void checkBoxToAllUnits_CheckedChanged(object sender, EventArgs e)
+        {
+
+            if (checkBoxToAllUnits.Checked)
+            {
+                comboBoxUnitTo.Enabled = false;
+            }
+            else
+            {
+                textBoxTo.Text = " ";
+                comboBoxUnitTo.Enabled = true;
+            }
         }
 
         private void CreateCategories()
@@ -145,101 +129,71 @@ namespace UnitConverter
             // categories.Add(lenghtCategory);
             // categories.Add(lenghtCategory);
             //categories.Add(lenghtCategory);
+          /*
+            categories = new List<string>();
+            categories.Add(lenghtCategory.Name);
+            categories.Add(informationVolumeCategory.Name);
+            // categories.Add(lenghtCategory);
+            // categories.Add(lenghtCategory);
+            //categories.Add(lenghtCategory);
+          */
+            CreateRuTranslations();
+        }
 
-
-
+        private void CreateRuTranslations()
+        {
             translateCategoriesEnToRu = new Dictionary<string, string>()
             {
-                {lenghtCategory.Name, "Длина"},
-                
+                {"Lenght", "Длина"},
+                {"Information Volume", "Объём информации"},
 
-                {informationVolumeCategory.Name, "Объём информации"},
-                
             };
 
             translateUnitsEnToRu = new Dictionary<string, string>()
             {
-                
                 { "kilometer",  "километр"},
                 { "foot",       "фут"},
                 { "yard",       "ярд"},
                 { "meter",      "метр"},
 
-                
                 { "kilobyte",  "Килобайт"},
                 { "megabyte",  "Мебибайт"},
                 { "gigabyte",  "Гигабайт"},
                 { "kibibyte",  "Кибибайт"},
                 { "mebibyte",  "Мебибайт"},
                 { "gibibyte",  "Гибибайт"},
-                { "byte",  "байт"},
+                { "byte",      "байт"},
             };
-
-            categoriesNameRu = new List<string>();
-            
-                foreach(var i in translateCategoriesEnToRu)
-                {
-                    categoriesNameRu.Add(i.Value);
-                }
-            
-
         }
 
-
-
-        private void comboBoxСategory_SelectedValueChanged(object sender, EventArgs e)
-        {
-           // categoriesNameRu[]
-            selectedCategory = (Category)comboBoxСategory.SelectedValue;
-
-            var tt = CreateTranslations(selectedCategory.UnitList, translateUnitsEnToRu);
-
-            comboBoxUnitTo.DataSource = tt;
-            comboBoxUnitTo.ValueMember = "Name";
-            comboBoxUnitTo.DisplayMember = "RussianName";
-
-            //comboBoxUnitTo.DataSource = selectedCategory.UnitList;
-            comboBoxUnitFrom.DataSource = selectedCategory.UnitList.ToList();
-            // comboBoxUnitFrom.DisplayMember = "Name";
-
-            textBoxTo.Text = " ";
-
-            //enteredValue = double.Parse(textBoxFrom.Text);
-            //selectedUnitFrom = comboBoxUnitFrom.Text;
-            //selectedUnitTo = comboBoxUnitTo.Text;
-        }
-
-        private DataTable CreateTranslations(List<string> units, Dictionary<string, string> translations)
+        private DataTable CreateTranslations(List<string> listForTranslate, Dictionary<string, string> dictionaryOfTranslations)
         {
             DataTable dataTable = new DataTable();
             DataColumn name = new DataColumn("Name", typeof(string));
-            DataColumn ruName = new DataColumn("RussianName", typeof(string));
+            DataColumn translateName = new DataColumn("TranslateName", typeof(string));
 
             dataTable.Columns.Add(name);
-            dataTable.Columns.Add(ruName);
+            dataTable.Columns.Add(translateName);
 
-            foreach (var item in units)
-                dataTable.Rows.Add(item, translations[item]);
+            foreach (var item in listForTranslate)
+                dataTable.Rows.Add(item, dictionaryOfTranslations[item]);
 
             return dataTable;
         }
 
-        private void checkBoxToAllUnits_CheckedChanged(object sender, EventArgs e)
+        private DataTable CreateTranslationsCategory(List<Category> listForTranslate, Dictionary<string, string> dictionaryOfTranslations)
         {
+            DataTable dataTable = new DataTable();
+            DataColumn name = new DataColumn("Name", typeof(Category));
+            DataColumn translateName = new DataColumn("TranslateName", typeof(string));
 
-            if (checkBoxToAllUnits.Checked)
-            {
-                comboBoxUnitTo.Enabled = false;
-            }
-            else
-            {
-                textBoxTo.Text = " ";
-                comboBoxUnitTo.Enabled = true;
-            }
+            dataTable.Columns.Add(name);
+            dataTable.Columns.Add(translateName);
+
+            foreach (var item in listForTranslate)
+                dataTable.Rows.Add(item, dictionaryOfTranslations[item.Name]);
+
+            return dataTable;
         }
     }
-
-   
-
-   
 }
