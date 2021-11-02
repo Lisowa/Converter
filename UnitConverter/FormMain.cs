@@ -25,6 +25,7 @@ namespace UnitConverter
   
         public FormMain()
         {
+          
             InitializeComponent();
             CreateCategories();
 
@@ -35,7 +36,7 @@ namespace UnitConverter
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void buttonCalculate_Click(object sender, EventArgs e)
         {
             if (double.TryParse(textBoxFrom.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out enteredValue))
             {
@@ -104,39 +105,67 @@ namespace UnitConverter
         {
             Dictionary<string, double> lenghtUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "kilometer",  10},
-                    { "foot",       20},
-                    { "yard",       30}
+                    { "kilometer",  1e-3},
+                    { "millimeter", 1e3},
+                    { "centimeter", 1e2},
+                    { "foot",       3.28084},
+                    { "yard",       1.09361},
+                    { "inch",       39.3701},
+                    { "mile",       (double)1/1609},
             };
             string lenghtBaseUnit = "meter";
             Category lenghtCategory = new Category("Lenght", lenghtUnintsDictionary, lenghtBaseUnit);
 
             Dictionary<string, double> informationVolumeUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "kilobyte",  10e3},
-                    { "megabyte",  10e6},
-                    { "gigabyte",  10e9},
-                    { "kibibyte",  Math.Pow(2,10)},
-                    { "mebibyte",  Math.Pow(2,20)},
-                    { "gibibyte",  Math.Pow(2,30)}
+                    { "kilobyte",  1e-3},
+                    { "megabyte",  1e-6},
+                    { "gigabyte",  1e-9},
+                    { "kibibyte",  1/Math.Pow(2,10)},
+                    { "mebibyte",  1/Math.Pow(2,20)},
+                    { "gibibyte",  1/Math.Pow(2,30)}
             };
             string informationVolumeBaseUnit = "byte";
             Category informationVolumeCategory = new Category("Information Volume", informationVolumeUnintsDictionary, informationVolumeBaseUnit);
 
+            Dictionary<string, double> MassUnintsDictionary = new Dictionary<string, double>()
+            {
+                    { "gram",           1e3},
+                    { "British ton",    (double)1/1016},
+                    { "American ton",   (double)1/907},
+                    { "pound",          2.2046},
+                    { "ounce",          35.274},
+            };
+            string MassBaseUnit = "kilogram";
+            Category MassCategory = new Category("Mass", MassUnintsDictionary, MassBaseUnit);
+
+            Dictionary<string, double> FlatAngleUnintsDictionary = new Dictionary<string, double>()
+            {
+                    { "gon",            (double)200/180},
+                    { "angular minute", 60},
+                    { "angular second", 3600},
+                    { "rad",            Math.PI/180},
+            };
+            string FlatAngleBaseUnit = "angular degree";
+            Category FlatAngleCategory = new Category("Flat Angle", FlatAngleUnintsDictionary, FlatAngleBaseUnit);
+
+            Dictionary<string, double> SquareUnintsDictionary = new Dictionary<string, double>()
+            {
+                    { "square kilometer", 1e-6},
+                    { "hectare",          1e-4},
+                    { "acre",             (double)1/4047},
+                    { "square inch",      1550},
+            };
+            string SquareBaseUnit = "square meter";
+            Category SquareCategory = new Category("Square", SquareUnintsDictionary, SquareBaseUnit);
+
             categories = new List<Category>();
             categories.Add(lenghtCategory);
             categories.Add(informationVolumeCategory);
-            // categories.Add(lenghtCategory);
-            // categories.Add(lenghtCategory);
-            //categories.Add(lenghtCategory);
-          /*
-            categories = new List<string>();
-            categories.Add(lenghtCategory.Name);
-            categories.Add(informationVolumeCategory.Name);
-            // categories.Add(lenghtCategory);
-            // categories.Add(lenghtCategory);
-            //categories.Add(lenghtCategory);
-          */
+            categories.Add(MassCategory);
+            categories.Add(FlatAngleCategory);
+            categories.Add(SquareCategory);
+
             CreateRuTranslations();
         }
 
@@ -146,23 +175,48 @@ namespace UnitConverter
             {
                 {"Lenght", "Длина"},
                 {"Information Volume", "Объём информации"},
-
+                {"Mass", "Масса"},
+                {"Flat Angle", "Плоский угол"},
+                {"Square", "Площадь"},
             };
 
             translateUnitsEnToRu = new Dictionary<string, string>()
             {
-                { "kilometer",  "километр"},
-                { "foot",       "фут"},
-                { "yard",       "ярд"},
-                { "meter",      "метр"},
+                { "kilometer",  "Километр"},
+                { "foot",       "Фут"},
+                { "yard",       "Ярд"},
+                { "meter",      "Метр"},
+                { "millimeter", "Миллиметр"},
+                { "centimeter", "Сантиметр"},
+                { "inch",       "Дюйм"},
+                { "mile",       "Миля"},
 
                 { "kilobyte",  "Килобайт"},
-                { "megabyte",  "Мебибайт"},
+                { "megabyte",  "Мегабайт"},
                 { "gigabyte",  "Гигабайт"},
                 { "kibibyte",  "Кибибайт"},
                 { "mebibyte",  "Мебибайт"},
                 { "gibibyte",  "Гибибайт"},
-                { "byte",      "байт"},
+                { "byte",      "Байт"},
+
+                { "kilogram",    "Килограмм"},
+                { "gram",        "Грамм"},
+                { "British ton", "Английская тонна"},
+                { "American ton","Американская тонна"},
+                { "pound",       "Фунт"},
+                { "ounce",       "Унция"},
+
+                { "gon",            "Град"},
+                { "angular minute", "Угловая минута"},
+                { "angular second", "Угловая секунда"},
+                { "rad",            "Рад"},
+                { "angular degree", "Угловой градус"},
+
+                { "square meter",     "Квадратный метр"},
+                { "square kilometer", "Квадратный километр"},
+                { "hectare",          "Гектар"},
+                { "acre",             "Акр"},
+                { "square inch",      "Квадратный дюйм"},
             };
         }
 

@@ -59,7 +59,7 @@ namespace UnitConverter
             this.buttonCalculate.TabIndex = 2;
             this.buttonCalculate.Text = "Рассчитать";
             this.buttonCalculate.UseVisualStyleBackColor = true;
-            this.buttonCalculate.Click += new System.EventHandler(this.button1_Click);
+            this.buttonCalculate.Click += new System.EventHandler(this.buttonCalculate_Click);
             // 
             // comboBoxUnitFrom
             // 
@@ -93,9 +93,8 @@ namespace UnitConverter
             // 
             this.textBoxTo.BackColor = System.Drawing.SystemColors.Control;
             this.textBoxTo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxTo.Enabled = false;
             this.textBoxTo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxTo.ForeColor = System.Drawing.SystemColors.Control;
+            this.textBoxTo.ForeColor = System.Drawing.SystemColors.WindowText;
             this.textBoxTo.Location = new System.Drawing.Point(280, 80);
             this.textBoxTo.Multiline = true;
             this.textBoxTo.Name = "textBoxTo";
