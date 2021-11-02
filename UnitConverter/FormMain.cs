@@ -2,29 +2,33 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Text;
 using System.Windows.Forms;
 using UnitConverter.Logic;
 
 namespace UnitConverter
 {
-    public partial class FormMain : System.Windows.Forms.Form
+    public partial class FormMain : Form
     {
+        private const string cValueMember = "Name";
+        private const string cDisplayMember = "TranslateName";
+
         private List<Category> categories;
         private Category selectedCategory;
         private string selectedUnitFrom;
         private string selectedUnitTo;
         private double enteredValue;
-        private Dictionary<string, string> translateCategoriesEnToRu;
-        private Dictionary<string, string> translateUnitsEnToRu;
-  
+        private Dictionary<string, string> categoriesTranslationEnToRu;
+        private Dictionary<string, string> unitsTranslationEnToRu;
+
         public FormMain()
         {
             InitializeComponent();
             CreateCategories();
 
-            var displayCategories = CreateTranslationsCategory(categories, translateCategoriesEnToRu);
-            comboBoxСategory.ValueMember = "Name";
-            comboBoxСategory.DisplayMember = "TranslateName";
+            var displayCategories = CreateTranslationsTable(categories, categoriesTranslationEnToRu);
+            comboBoxСategory.ValueMember = cValueMember;
+            comboBoxСategory.DisplayMember = cDisplayMember;
             comboBoxСategory.DataSource = displayCategories;
         }
 
@@ -32,18 +36,19 @@ namespace UnitConverter
         {
             if (double.TryParse(textBoxFrom.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out enteredValue))
             {
-                //selectedUnitFrom = comboBoxUnitFrom.Text;
                 selectedUnitFrom = (string)comboBoxUnitFrom.SelectedValue;
 
                 if (checkBoxToAllUnits.Checked)
                 {
-                    string valueWithUnitFrom = enteredValue.ToString() + " " + translateUnitsEnToRu[selectedUnitFrom];
-                    string valueWithUnitTo = null;
+                    string valueWithUnitFrom = $"{enteredValue} {unitsTranslationEnToRu[selectedUnitFrom]}";
 
-                    foreach (var unitto in selectedCategory.UnitList)
+                    StringBuilder sb = new StringBuilder();
+                    foreach (var unitTo in selectedCategory.UnitList)
                     {
-                        valueWithUnitTo += selectedCategory.Convert(enteredValue, selectedUnitFrom, unitto).ToString() + " " + translateUnitsEnToRu[unitto] + "\r\n\r\n";
+                        sb.AppendLine($"{selectedCategory.Convert(enteredValue, selectedUnitFrom, unitTo)} {unitsTranslationEnToRu[unitTo]}");
+                        sb.AppendLine();
                     }
+                    string valueWithUnitTo = sb.ToString();
 
                     var formToAllUnints = new FormToAllUnints(valueWithUnitFrom, valueWithUnitTo);
                     formToAllUnints.ShowDialog();
@@ -59,25 +64,25 @@ namespace UnitConverter
                 MessageBox.Show("Допускается ввод только чисел.\nВ качестве разделителя используйте \".\".", "Неверный формат!");
             }
         }
-
         private void comboBoxСategory_SelectedValueChanged(object sender, EventArgs e)
         {
             selectedCategory = (Category)comboBoxСategory.SelectedValue;
-            if (selectedCategory == null) return;
-            var displayUnitsFrom = CreateTranslations(selectedCategory.UnitList, translateUnitsEnToRu);
-            var displayUnitsTo = CreateTranslations(selectedCategory.UnitList, translateUnitsEnToRu);
+            if (selectedCategory == null)
+                return;
 
-            comboBoxUnitTo.DataSource = displayUnitsTo;
-            comboBoxUnitTo.ValueMember = "Name";
-            comboBoxUnitTo.DisplayMember = "TranslateName";
+            var displayUnitsFrom = CreateTranslationsTable(selectedCategory.UnitList, unitsTranslationEnToRu);
+            var displayUnitsTo = CreateTranslationsTable(selectedCategory.UnitList, unitsTranslationEnToRu);
 
             comboBoxUnitFrom.DataSource = displayUnitsFrom;
-            comboBoxUnitFrom.ValueMember = "Name";
-            comboBoxUnitFrom.DisplayMember = "TranslateName";
+            comboBoxUnitFrom.ValueMember = cValueMember;
+            comboBoxUnitFrom.DisplayMember = cDisplayMember;
 
-            textBoxTo.Text = " ";
+            comboBoxUnitTo.DataSource = displayUnitsTo;
+            comboBoxUnitTo.ValueMember = cValueMember;
+            comboBoxUnitTo.DisplayMember = cDisplayMember;
+
+            textBoxTo.Text = string.Empty;
         }
-
         private void checkBoxToAllUnits_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxToAllUnits.Checked)
@@ -86,7 +91,7 @@ namespace UnitConverter
             }
             else
             {
-                textBoxTo.Text = " ";
+                textBoxTo.Text = string.Empty;
                 comboBoxUnitTo.Enabled = true;
             }
         }
@@ -95,126 +100,126 @@ namespace UnitConverter
         {
             Dictionary<string, double> lenghtUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "kilometer",  1e-3},
-                    { "millimeter", 1e3},
-                    { "centimeter", 1e2},
-                    { "foot",       3.28084},
-                    { "yard",       1.09361},
-                    { "inch",       39.3701},
-                    { "mile",       (double)1/1609},
+                    { "kilometer",  1e-3 },
+                    { "millimeter", 1e3 },
+                    { "centimeter", 1e2 },
+                    { "foot",       3.28084 },
+                    { "yard",       1.09361 },
+                    { "inch",       39.3701 },
+                    { "mile",       1.0 / 1609 },
             };
             string lenghtBaseUnit = "meter";
             Category lenghtCategory = new Category("Lenght", lenghtUnintsDictionary, lenghtBaseUnit);
 
             Dictionary<string, double> informationVolumeUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "kilobyte",  1e-3},
-                    { "megabyte",  1e-6},
-                    { "gigabyte",  1e-9},
-                    { "kibibyte",  1/Math.Pow(2,10)},
-                    { "mebibyte",  1/Math.Pow(2,20)},
-                    { "gibibyte",  1/Math.Pow(2,30)}
+                    { "kilobyte",  1e-3 },
+                    { "megabyte",  1e-6 },
+                    { "gigabyte",  1e-9 },
+                    { "kibibyte",  1 / Math.Pow(2, 10) },
+                    { "mebibyte",  1 / Math.Pow(2, 20) },
+                    { "gibibyte",  1 / Math.Pow(2, 30) }
             };
             string informationVolumeBaseUnit = "byte";
             Category informationVolumeCategory = new Category("Information Volume", informationVolumeUnintsDictionary, informationVolumeBaseUnit);
 
-            Dictionary<string, double> MassUnintsDictionary = new Dictionary<string, double>()
+            Dictionary<string, double> massUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "gram",           1e3},
-                    { "British ton",    (double)1/1016},
-                    { "American ton",   (double)1/907},
-                    { "pound",          2.2046},
-                    { "ounce",          35.274},
+                    { "gram",           1e3 },
+                    { "British ton",    1.0 / 1016 },
+                    { "American ton",   1.0 / 907 },
+                    { "pound",          2.2046 },
+                    { "ounce",          35.274 },
             };
-            string MassBaseUnit = "kilogram";
-            Category MassCategory = new Category("Mass", MassUnintsDictionary, MassBaseUnit);
+            string massBaseUnit = "kilogram";
+            Category massCategory = new Category("Mass", massUnintsDictionary, massBaseUnit);
 
-            Dictionary<string, double> FlatAngleUnintsDictionary = new Dictionary<string, double>()
+            Dictionary<string, double> flatAngleUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "gon",            (double)200/180},
-                    { "angular minute", 60},
-                    { "angular second", 3600},
-                    { "rad",            Math.PI/180},
+                    { "gon",            200.0 / 180 },
+                    { "angular minute", 60 },
+                    { "angular second", 3600 },
+                    { "rad",            Math.PI / 180 },
             };
-            string FlatAngleBaseUnit = "angular degree";
-            Category FlatAngleCategory = new Category("Flat Angle", FlatAngleUnintsDictionary, FlatAngleBaseUnit);
+            string flatAngleBaseUnit = "angular degree";
+            Category flatAngleCategory = new Category("Flat Angle", flatAngleUnintsDictionary, flatAngleBaseUnit);
 
-            Dictionary<string, double> SquareUnintsDictionary = new Dictionary<string, double>()
+            Dictionary<string, double> squareUnintsDictionary = new Dictionary<string, double>()
             {
-                    { "square kilometer", 1e-6},
-                    { "hectare",          1e-4},
-                    { "acre",             (double)1/4047},
-                    { "square inch",      1550},
+                    { "square kilometer", 1e-6 },
+                    { "hectare",          1e-4 },
+                    { "acre",             1.0 / 4047 },
+                    { "square inch",      1550 },
             };
-            string SquareBaseUnit = "square meter";
-            Category SquareCategory = new Category("Square", SquareUnintsDictionary, SquareBaseUnit);
+            string squareBaseUnit = "square meter";
+            Category squareCategory = new Category("Square", squareUnintsDictionary, squareBaseUnit);
 
-            categories = new List<Category>();
-            categories.Add(lenghtCategory);
-            categories.Add(informationVolumeCategory);
-            categories.Add(MassCategory);
-            categories.Add(FlatAngleCategory);
-            categories.Add(SquareCategory);
+            categories = new List<Category>
+            {
+                lenghtCategory,
+                informationVolumeCategory,
+                massCategory,
+                flatAngleCategory,
+                squareCategory,
+            };
 
             CreateRuTranslations();
         }
-
         private void CreateRuTranslations()
         {
-            translateCategoriesEnToRu = new Dictionary<string, string>()
+            categoriesTranslationEnToRu = new Dictionary<string, string>()
             {
-                {"Lenght", "Длина"},
-                {"Information Volume", "Объём информации"},
-                {"Mass", "Масса"},
-                {"Flat Angle", "Плоский угол"},
-                {"Square", "Площадь"},
+                { "Lenght", "Длина" },
+                { "Information Volume", "Объём информации" },
+                { "Mass", "Масса" },
+                { "Flat Angle", "Плоский угол" },
+                { "Square", "Площадь" },
             };
 
-            translateUnitsEnToRu = new Dictionary<string, string>()
+            unitsTranslationEnToRu = new Dictionary<string, string>()
             {
-                { "kilometer",  "Километр"},
-                { "foot",       "Фут"},
-                { "yard",       "Ярд"},
-                { "meter",      "Метр"},
-                { "millimeter", "Миллиметр"},
-                { "centimeter", "Сантиметр"},
-                { "inch",       "Дюйм"},
-                { "mile",       "Миля"},
+                { "kilometer",  "Километр" },
+                { "foot",       "Фут" },
+                { "yard",       "Ярд" },
+                { "meter",      "Метр" },
+                { "millimeter", "Миллиметр" },
+                { "centimeter", "Сантиметр" },
+                { "inch",       "Дюйм" },
+                { "mile",       "Миля" },
 
-                { "kilobyte",  "Килобайт"},
-                { "megabyte",  "Мегабайт"},
-                { "gigabyte",  "Гигабайт"},
-                { "kibibyte",  "Кибибайт"},
-                { "mebibyte",  "Мебибайт"},
-                { "gibibyte",  "Гибибайт"},
-                { "byte",      "Байт"},
+                { "kilobyte",  "Килобайт" },
+                { "megabyte",  "Мегабайт" },
+                { "gigabyte",  "Гигабайт" },
+                { "kibibyte",  "Кибибайт" },
+                { "mebibyte",  "Мебибайт" },
+                { "gibibyte",  "Гибибайт" },
+                { "byte",      "Байт" },
 
-                { "kilogram",    "Килограмм"},
-                { "gram",        "Грамм"},
-                { "British ton", "Английская тонна"},
-                { "American ton","Американская тонна"},
-                { "pound",       "Фунт"},
-                { "ounce",       "Унция"},
+                { "kilogram",     "Килограмм" },
+                { "gram",         "Грамм" },
+                { "British ton",  "Английская тонна" },
+                { "American ton", "Американская тонна" },
+                { "pound",        "Фунт" },
+                { "ounce",        "Унция" },
 
-                { "gon",            "Град"},
-                { "angular minute", "Угловая минута"},
-                { "angular second", "Угловая секунда"},
-                { "rad",            "Рад"},
-                { "angular degree", "Угловой градус"},
+                { "gon",            "Град" },
+                { "angular minute", "Угловая минута" },
+                { "angular second", "Угловая секунда" },
+                { "rad",            "Рад" },
+                { "angular degree", "Угловой градус" },
 
-                { "square meter",     "Квадратный метр"},
-                { "square kilometer", "Квадратный километр"},
-                { "hectare",          "Гектар"},
-                { "acre",             "Акр"},
-                { "square inch",      "Квадратный дюйм"},
+                { "square meter",     "Квадратный метр" },
+                { "square kilometer", "Квадратный километр" },
+                { "hectare",          "Гектар" },
+                { "acre",             "Акр" },
+                { "square inch",      "Квадратный дюйм" },
             };
         }
-
-        private DataTable CreateTranslations(List<string> listForTranslate, Dictionary<string, string> dictionaryOfTranslations)
+        private DataTable CreateTranslationsTable(List<string> listForTranslate, Dictionary<string, string> dictionaryOfTranslations)
         {
             DataTable dataTable = new DataTable();
-            DataColumn name = new DataColumn("Name", typeof(string));
-            DataColumn translateName = new DataColumn("TranslateName", typeof(string));
+            DataColumn name = new DataColumn(cValueMember, typeof(string));
+            DataColumn translateName = new DataColumn(cDisplayMember, typeof(string));
 
             dataTable.Columns.Add(name);
             dataTable.Columns.Add(translateName);
@@ -224,12 +229,11 @@ namespace UnitConverter
 
             return dataTable;
         }
-
-        private DataTable CreateTranslationsCategory(List<Category> listForTranslate, Dictionary<string, string> dictionaryOfTranslations)
+        private DataTable CreateTranslationsTable(List<Category> listForTranslate, Dictionary<string, string> dictionaryOfTranslations)
         {
             DataTable dataTable = new DataTable();
-            DataColumn name = new DataColumn("Name", typeof(Category));
-            DataColumn translateName = new DataColumn("TranslateName", typeof(string));
+            DataColumn name = new DataColumn(cValueMember, typeof(Category));
+            DataColumn translateName = new DataColumn(cDisplayMember, typeof(string));
 
             dataTable.Columns.Add(name);
             dataTable.Columns.Add(translateName);

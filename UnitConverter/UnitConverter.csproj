@@ -58,7 +58,7 @@
     <Compile Include="FormToAllUnints.Designer.cs">
       <DependentUpon>FormToAllUnints.cs</DependentUpon>
     </Compile>
-    <Compile Include="Logic\ClassCategory.cs" />
+    <Compile Include="Logic\Category.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FormMain.resx">

@@ -1,6 +1,8 @@
-﻿namespace UnitConverter
+﻿using System.Windows.Forms;
+
+namespace UnitConverter
 {
-    public partial class FormToAllUnints : System.Windows.Forms.Form
+    public partial class FormToAllUnints : Form
     {
         public FormToAllUnints()
         {
